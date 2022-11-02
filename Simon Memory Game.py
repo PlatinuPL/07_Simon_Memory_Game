@@ -1,3 +1,4 @@
+#A simple game which consists in remembering the sequence of computer movements
 import tkinter as tk
 import random
 from tkinter import ACTIVE, DISABLED, StringVar, NORMAL
