@@ -1,9 +1,10 @@
 #A simple game which consists in remembering the sequence of computer movements
+#Simon Memory Game
 import tkinter as tk
 import random
 from tkinter import ACTIVE, DISABLED, StringVar, NORMAL
 
-
+#Define window
 root = tk.Tk()
 root.title("Simon Memory Game")
 root.iconbitmap("simon.ico")
@@ -33,19 +34,26 @@ player_sequence = []
 
 # Define functions
 def pick_sequence():
+    """Pick the next value in the sequence. Do not allow for repeated values."""
     while True:
         value =  random.randint(1,4)
+        #Sequence is size 0, so take the value regardless
         if len(game_sequence) == 0:
             game_sequence.append(value)
             break
+        #make sure the current value is not the same as the last value in the sequence
         elif value!= game_sequence[-1]:
             game_sequence.append(value)
             break
-
+    #Now that the value is added to the sequence, play the sequence
     play_sequence()
     
 def play_sequence():
+    """Play the entire sequence for a given round by animating the buttons"""
+    #Change button label
     change_label("Playing!")
+
+    #Without delay, all buttons will animate at the same time. The delay adds the 'time' variable to each .after()
     delay = 0
     for value in game_sequence:
         if value == 1:
@@ -57,15 +65,18 @@ def play_sequence():
         elif value ==4:
             root.after(delay, lambda:animate(yellow_button))
 
+        #Increment delay for next iteration of loop
         delay += time
 
 
 def animate(button):
+    """Animate a given button by chaning its color"""
     button.config(state= ACTIVE)
     root.after(time, lambda:button.config(state=NORMAL))
 
 
 def change_label(massage):
+    """Update the start button text and color to let the player know their status."""
     start_button.config(text=massage)
 
     if massage == "Wrong!":
@@ -75,7 +86,10 @@ def change_label(massage):
 
 
 def set_difficulty():
+    """Use radio buttons to set difficulty. Difficulty affects time between button 'flashes'"""
     global time
+
+    #Change the time (difficulty) based off the value of the radio buttons
     if difficulty.get() == "Easy":
         time = 1000
     elif difficulty.get() == "Medium":
@@ -84,45 +98,58 @@ def set_difficulty():
         time = 200
 
 def disable():
+    """Dislabe all buttons so they can't accidentally be pressed."""
     white_button.config(state=DISABLED)
     magenta_button.config(state=DISABLED)
     cyan_button.config(state=DISABLED)
     yellow_button.config(state=DISABLED)
 
 def enable():
+    """Enable all buttons to start the game and pick the first value in the sequence."""
     white_button.config(state=NORMAL)
     magenta_button.config(state=NORMAL)
     cyan_button.config(state=NORMAL)
     yellow_button.config(state=NORMAL)
 
+    #Pick a value!
     pick_sequence()
 
 
 def press(value):
+    """Simulate pressing a button for player."""
+    #Add the players press to players sequence
     player_sequence.append(value) 
 
+    #If the current 'round' is over, check to see if the player enter the correct sequence of button presses
     if len(player_sequence) ==len(game_sequence):
         check_round()
 
 def check_round():
+    """Determine if the player entered the correct sequence of button presses for a round."""
     global player_sequence
     global game_sequence
     global score
 
+    #The player is correct, so change the label, update score, wait, then start the next round.
     if player_sequence == game_sequence:
         change_label("Correct!")
         score += len(player_sequence) + int(1000/time)
         root.after(500, pick_sequence)
+
+    #The player is incorrect so change label, update score, disable buttons, and reset for new game.
     else:
         change_label("Wrong!")
         score = 0
         disable()
+        #The game is over, so wipe the game sequence
         game_sequence = []
-
+        #Wait 2 seconds then change the message
         root.after(2000, lambda:change_label("New Game"))
 
+    #Regardless of win or lose for a round, wipe the players sequence
     player_sequence = []
 
+    #Update score label
     score_label.config(text = "Score: " + str(score))
     
 
@@ -141,6 +168,7 @@ start_button.grid(row=0,column=0, padx=20, ipadx= 30)
 score_label.grid(row=0,column=1)
 
 # Define layout for the game frame
+#Make the game buttons
 white_button = tk.Button(game_frame, bg = white, activebackground= white_light, borderwidth=3, state= DISABLED, command=lambda:press(1))
 white_button.grid(row = 0, column= 0, columnspan= 2, padx= 10, pady= 10, ipadx = 60, ipady = 50)
 magenta_button = tk.Button(game_frame, bg = magenta, activebackground= magenta_light, borderwidth=3, state= DISABLED, command=lambda:press(2))

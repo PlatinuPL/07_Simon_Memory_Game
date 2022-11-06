@@ -1,0 +1,1 @@
+This is a Simon app to entertain yourself and test your memory recall
